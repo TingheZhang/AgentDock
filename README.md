@@ -7,4 +7,4 @@ agent memory was from https://github.com/basicmachines-co/basic-memory
 
 code map was from https://github.com/DeusData/codebase-memory-mcp
 
-local memory was from https://github.com/MrLesk/Backlog.md
+local memory and web visulizer was from https://github.com/MrLesk/Backlog.md
