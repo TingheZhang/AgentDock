@@ -1,0 +1,6 @@
+[Unit]
+Description=VCC 平台健康检查（补偿 oneshot 单元察觉不到子进程崩溃）
+
+[Service]
+Type=oneshot
+ExecStart=$HOME_DIR/.config/systemd/user/vcc-healthcheck.sh

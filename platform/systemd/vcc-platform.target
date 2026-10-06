@@ -1,0 +1,8 @@
+[Unit]
+Description=VCC 科研协作平台（Backlog + 知识层 + 笔记）
+Documentation=file://$PLATFORM_ROOT/platform/review/platform-review-brief.md
+Wants=vcc-backlog.service vcc-knowledge.service vcc-basic-memory.service
+After=vcc-backlog.service vcc-knowledge.service vcc-basic-memory.service
+
+[Install]
+WantedBy=default.target

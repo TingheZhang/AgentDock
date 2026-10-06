@@ -1,0 +1,89 @@
+{
+  "bind_ip": "<LAN_IP>,<TAILSCALE_IP>",
+  "dashboard_port": 6421,
+  "dashboard_refresh_minutes": 5,
+  "_comment": [
+    "Single source of truth for Backlog.md ports on this host.",
+    "Read by BOTH bb-ports.sh (to start/stop each project's Web UI) and",
+    "bb-aggregate.py (to build the dashboard project list and links), so the",
+    "dashboard can never disagree with what is actually running.",
+    "",
+    "Each project must contain its own Backlog.md container: either",
+    "backlog/config.yml (default) or .backlog/config.yml (what we use here).",
+    "Backlog.md rejects any --backlog-dir that points outside the project,",
+    "so a shared container is not possible.",
+    "",
+    "Fields per project:",
+    "  name     unique short id, used by: bb-ports.sh start|stop <name>",
+    "  path     absolute path to the project directory (must exist)",
+    "  group    heading this project is filed under on the dashboard",
+    "  ui_port  preferred port; if taken, the next free port is used instead",
+    "",
+    "  knowledge  what belongs to this project. Read by BOTH the 6424",
+    "             reader and the panel injected into this project's board,",
+    "             so knowledge follows the project instead of being",
+    "             hardcoded to one wiki_id / one notes dir:",
+    "    note_subdirs  dirs under MyTask/memory holding this project's notes",
+    "    wikis         wiki_id list from MemoryKnowledge; [] = none",
+    "    panel         true = inject the knowledge panel into this board",
+    "",
+    "extra_links: services that are reachable but are NOT Backlog.md",
+    "projects (no container, no tasks). Rendered by bb-aggregate.py as a",
+    "separate group so they are never mistaken for a project board:",
+    "  name  label on the tile",
+    "  port  TCP port; link is built from bind_ip",
+    "  desc  one-line description",
+    "  group heading, defaults to \"Other services\""
+  ],
+  "projects": [
+    {
+      "name": "vcc-example-project",
+      "path": "$PROJECT_DIR/example-project",
+      "group": "<STUDY_GROUP>",
+      "ui_port": 6422,
+      "knowledge": {
+        "note_subdirs": [
+          "projects/example-project"
+        ],
+        "wikis": [],
+        "panel": true
+      }
+    },
+    {
+      "name": "writing-side",
+      "path": "$PLATFORM_ROOT/platform",
+      "group": "写作侧",
+      "ui_port": 6420,
+      "knowledge": {
+        "note_subdirs": [
+          "projects/writing-side"
+        ],
+        "wikis": [],
+        "panel": true
+      }
+    },
+    {
+      "name": "platform-core",
+      "path": "$PROJECT_DIR/platform-core",
+      "group": "平台",
+      "ui_port": 6423,
+      "knowledge": {
+        "note_subdirs": [
+          "projects/platform"
+        ],
+        "wikis": [
+          "<WIKI_ID>"
+        ],
+        "panel": true
+      }
+    }
+  ],
+  "extra_links": [
+    {
+      "name": "知识与笔记",
+      "port": 6424,
+      "desc": "全平台知识总览：按项目分组浏览 wiki 与笔记",
+      "group": "知识库"
+    }
+  ]
+}

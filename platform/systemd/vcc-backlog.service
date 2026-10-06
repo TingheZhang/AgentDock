@@ -1,0 +1,50 @@
+[Unit]
+Description=VCC Backlog.md 三端口（6420 写作侧 / 6421 聚合页 / 6422 VCC 项目）
+Documentation=file://$PLATFORM_ROOT/platform/AGENTS.md
+After=network-online.target
+Wants=network-online.target
+
+# 反复起不来时别无限刷日志；修好后 reset-failed 再 start。
+# StartLimitIntervalSec / StartLimitBurst 属于 [Unit] 段（systemd 249），
+# 写进 [Service] 会被静默忽略。
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+# Type=simple：ExecStart 是常驻的 supervisor，不是跑完就退的脚本。
+# bb-ports.sh 一次拉起 N 个子进程（N 个 backlog browser + N 个 relay + 1 个
+# dashboard），没有单一进程可供 systemd 持有，所以用
+# vcc-backlog-supervise.sh 包一层：它前台常驻、盯住所有子 pid，任一消失就
+# 清理后退出非 0 —— 这才让 Restart=always 真正生效。
+#
+# 改造前是 Type=oneshot + RemainAfterExit=yes，MainPID 恒为 0：
+#   - kill -9 掉任一 browser，systemd 仍报 active
+#   - Restart=on-failure 永不触发（脚本退出码 0）
+#   - status 里看不到任何真实 pid
+#
+# 想手工查看所有子进程：systemctl --user status vcc-backlog 后
+#   systemctl --user show vcc-backlog -p MainPID --value
+#   cat $PLATFORM_ROOT/platform/.state/pids/*.pid
+Type=simple
+WorkingDirectory=$PLATFORM_ROOT/platform
+ExecStart=$PLATFORM_ROOT/platform/vcc-backlog-supervise.sh run
+ExecStop=$PLATFORM_ROOT/platform/vcc-backlog-supervise.sh stop
+ExecReload=$PLATFORM_ROOT/platform/bb-ports.sh refresh
+
+Restart=always
+RestartSec=15
+TimeoutStartSec=180
+TimeoutStopSec=60
+# control-group（默认语义，显式写出）：supervisor 和它 nohup 拉起的
+# browser/relay/dashboard 全在同一 cgroup，systemd 停止时整组一起收。
+# 早先用 KillMode=mixed 只 TERM 主进程，journal 会刷
+# "Found left-over process ... in control group" 并把它们 SIGKILL，
+# 留下短暂的端口抖动窗口。
+KillMode=control-group
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=vcc-backlog
+
+[Install]
+WantedBy=default.target

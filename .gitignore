@@ -1,0 +1,23 @@
+# Local configuration -- copy ports.example.json and edit it.
+platform/ports.json
+
+# Generated aggregate dashboard
+platform/www/
+platform/aggregate.html
+
+# Runtime state
+state/
+*.log
+*.pid
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Never commit a rendered code graph: it grows to gigabytes on every watcher
+# update (see docs/OPERATIONS.md).
+.codebase-memory/
+*.db.zst
+
+# Backlog.md working data when the project is not under git
+.backlog/

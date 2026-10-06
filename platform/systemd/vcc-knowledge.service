@@ -1,0 +1,51 @@
+[Unit]
+Description=TencentDB MemoryKnowledge 知识层（8421，LLM 自动抽 Wiki）
+Documentation=file://$PLATFORM_ROOT/platform/review/memory-tools-config.md
+After=network-online.target
+Wants=network-online.target
+
+# 反复起不来时别无限刷日志：5 次/5 分钟之后放弃并置 failed。
+# 修好后 systemctl --user reset-failed <unit> 再 start。
+# StartLimitIntervalSec/StartLimitBurst 属于 [Unit] 段（systemd 249），
+# 放在 [Service] 里会被静默忽略。
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+# Type=simple：dist/server.mjs 是单进程，systemd 直接持有它当子进程。
+# 之前用 Type=oneshot + ks.sh（setsid nohup pnpm run dev），systemd 只看到
+# 一个「跑完就退」的脚本，MainPID 恒为 0，于是：
+#   - kill -9 掉真正的服务后，systemd 仍报 active
+#   - Restart=on-failure 永远不触发（脚本退出码是 0）
+#   - tsx 三层进程树（sh -c -> node cli.mjs -> node --import loader.mjs）
+#     SIGTERM 会留孤儿
+# 改为直接跑构建产物后，这三个问题一起消失。
+#
+# 首次部署前必须先构建（dist/ 在 .gitignore 里，不随代码走）：
+#   cd $TDAM_DIR
+#   PATH=$HOME_DIR/node22/bin:$PATH node node_modules/tsdown/dist/run.mjs
+# 注意入口是 dist/run.mjs，不是 node_modules/.bin/tsdown —— 后者是 shell
+# wrapper，喂给 node 会报 "SyntaxError: missing ) after argument list"。
+Type=simple
+WorkingDirectory=$TDAM_DIR
+Environment=PORT=8421
+Environment=HF_ENDPOINT=https://hf-mirror.com
+Environment=NODE_ENV=production
+ExecStart=$NODE_BIN dist/server.mjs
+
+# 崩溃/被 kill 后由 systemd 拉起。always 而非 on-failure：即使是干净的
+# SIGTERM 退出也要重启，避免「服务被人手工停掉后单元还挂着」。
+Restart=always
+RestartSec=10
+
+# 冷启动要建索引 + 打开 SQLite，给足时间；超时算失败 -> 触发 Restart。
+TimeoutStartSec=120
+TimeoutStopSec=30
+
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=vcc-knowledge
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,20 @@
+[Unit]
+Description=Basic Memory MCP 语义笔记服务（8765）
+Documentation=file://$PLATFORM_ROOT/platform/review/memory-tools-config.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# Type=simple：直接跑二进制，不用 nohup+&（systemd 自己管生命周期）
+Type=simple
+WorkingDirectory=/tmp
+Environment=HF_ENDPOINT=https://hf-mirror.com
+ExecStart=$HOME_DIR/miniconda3/envs/basic-memory/bin/basic-memory mcp \
+  --transport streamable-http --host 0.0.0.0 --port 8765
+Restart=always
+RestartSec=10
+StandardOutput=append:$LOG_DIR/bmmcp.log
+StandardError=append:$LOG_DIR/bmmcp.log
+
+[Install]
+WantedBy=default.target

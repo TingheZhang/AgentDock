@@ -1,0 +1,17 @@
+[Unit]
+Description=VCC readonly wiki + notes reader
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=$PLATFORM_ROOT/platform
+ExecStart=/usr/bin/python3 $PLATFORM_ROOT/platform/vcc-readonly.py
+Environment=VCC_READONLY_BIND=0.0.0.0
+Environment=VCC_READONLY_PORT=6424
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:/tmp/vcc-readonly.log
+StandardError=append:/tmp/vcc-readonly.log
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,28 @@
+# ── 运行时产物（bb-ports.sh 每次启动重新生成）──────────────────
+# .state/6420,6421,6422/relay.py  ← bb-ports.sh:110 heredoc 生成
+# .state/pids/*.pid                ← 进程 pid，每次变
+# .state/logs/*.log                ← 运行日志
+.state/
+
+# ── Backlog.md 内部数据（任务卡是 agent 产出的动态数据）────────
+# 若要版本化任务卡，请用 git -C <项目工作副本> 单独管，不要在这里
+backlog/tasks/
+backlog/drafts/
+backlog/completed/
+backlog/archive/
+backlog/.locks/
+
+# ── 生成物 ──────────────────────────────────────────────────
+www/index.html
+aggregate.html
+
+# ── 通用 ────────────────────────────────────────────────────
+*.log
+*.pid
+*.pyc
+__pycache__/
+.DS_Store
+*~
+
+# 配置改动前的手动备份（ports.json.bak-*），不入库
+*.bak-*

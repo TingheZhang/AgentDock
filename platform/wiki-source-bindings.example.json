@@ -1,0 +1,14 @@
+{
+  "comment": "声明哪些笔记是wiki 的输入源。用于 health_check 的 --deep 检测笔记比wiki 新（该重跑 ingest）。wiki 与笔记之间没有自动传导，改了笔记必须手动跑 wiki_sync.py sync。",
+  "bindings": [
+    {
+      "wiki_id": "<WIKI_ID>",
+      "service_id": "<TEAM_SLUG>",
+      "team_id": "<TEAM_ID>",
+      "note_paths": [
+        "projects/platform/平台运维铁律.md",
+        "projects/platform/多agent 改平台作业规约.md"
+      ]
+    }
+  ]
+}
