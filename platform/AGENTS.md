@@ -68,7 +68,7 @@ $PLATFORM_ROOT
 Quick health check, including note reconciliation:
 
 ```bash
-python3 /tmp/hc.py --deep        # if hc.py is not present, see OPERATIONS.md
+python3 scripts/health_check.py --json --url http://127.0.0.1:<PORT>/
 ./bb-ports.sh status
 ```
 

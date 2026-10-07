@@ -4,7 +4,7 @@ The registry is normally `platform/ports.json`, discovered from the selected
 platform root. Define it explicitly, for example:
 
 ```bash
-export PLATFORM_ROOT=/data/lisy/MyTask
+export PLATFORM_ROOT='<platform-root>'
 export VCC_REGISTRY="$PLATFORM_ROOT/platform/ports.json"
 ```
 

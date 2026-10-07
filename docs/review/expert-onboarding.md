@@ -51,7 +51,7 @@ Open: http://<LAN_IP>:6421/
 | `$HOME_DIR/.basic-memory/` | 知识库索引库（SQLite，一般不用动） |
 
 注意 `$NFS_MOUNT/` 是 **NFS**（网络文件系统，慢，不要在上面跑 git）；
-`/data/` 和 `/home/` 是**本地盘**。
+`<local-data-root>/` 和 `<home-root>/` 是**本地盘**。
 
 ---
 

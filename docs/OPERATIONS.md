@@ -5,7 +5,7 @@
 ## 一键操作
 
 ```bash
-systemctl --user start|stop|restart|status platform-core.target
+systemctl --user start|stop|restart|status vcc-platform.target
 systemctl --user list-timers vcc-healthcheck.timer   # 看下次自愈检查
 tail -f $LOG_DIR/healthcheck.log                # 自愈记录
 ```
@@ -24,11 +24,14 @@ tail -f $LOG_DIR/healthcheck.log                # 自愈记录
 ss -tlnp | grep -E '6420|6421|6422|8421|8765'   # 一次看全
 ```
 
-## ⚠️ oneshot 的盲区（必读）
+## 当前 unit 与历史 oneshot 说明
 
-`vcc-backlog` / `vcc-knowledge` 是 **Type=oneshot**：脚本用 nohup 拉起子进程后自己退出，
-systemd 认为 unit 仍`active`。**子进程崩溃时 systemd 完全不知情**——
-实测 `kill -9` 掉 8421 后 `is-active` 仍报 `active`。
+当前 `vcc-backlog.service` 使用常驻 `Type=simple` supervisor，并按项目隔离
+恢复；`vcc-knowledge.service` 直接持有构建后的知识服务进程。实际 unit 仍需用
+`systemctl --user cat/show` 核对，`is-active` 不能代替 HTTP 探测。
+
+旧 oneshot 盲区是历史背景：旧脚本用 nohup 拉起子进程后自己退出，systemd
+可能仍报 `active`，子进程崩溃也不会被 unit 感知。它不是当前 unit 的行为保证。
 
 补偿机制：`vcc-healthcheck.timer` 每 2 分钟检查五个端口，DOWN 就重启对应单元。
 日志在 `$LOG_DIR/healthcheck.log`。
@@ -97,7 +100,7 @@ chmod +x ~/.config/systemd/user/vcc-healthcheck.sh
 loginctl enable-linger $USER
 # 3. 启用
 systemctl --user daemon-reload
-systemctl --user enable --now platform-core.target vcc-healthcheck.timer
+systemctl --user enable --now vcc-platform.target vcc-healthcheck.timer
 # 4. 校验
 systemd-analyze verify ~/.config/systemd/user/vcc-backlog.service
 ```

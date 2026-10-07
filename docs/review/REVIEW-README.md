@@ -1,7 +1,11 @@
 # review/ 目录索引 —— 请先读这一页
 
+> **Historical evidence:** this is a dated review snapshot, not the current
+> operations authority. Use the repository root `SKILL.md`, `README.md`, and
+> `docs/OPERATIONS.md` for current procedures.
+
 > 最后更新：2026-10-05 20:35
-> 服务器 `<USER>@<LAN_IP>`，登录后：`cd /mnt/zhangth/projects/review && ls`
+> 服务器 `<USER>@<LAN_IP>`，登录后：`cd <legacy-projects-path>/review && ls`
 
 ---
 
@@ -20,7 +24,7 @@
 
 16:35 之后平台发生了一次**架构级重构**：
 
-1. **目录迁移** —— 全部路径从 `/mnt/zhangth/projects` / `$NOTES_PROJECT`
+1. **目录迁移** —— 全部路径从 `<legacy-projects-path>` / `$NOTES_PROJECT`
    改到 `$PLATFORM_ROOT/` 统一布局。旧文档里的路径大半已失效。
 2. **知识从平台级改为项目级** —— 旧文档写的是 6424 挂一个全局 wiki；
    现在是**每个看板内嵌自己项目的知识面板**（这是您上轮的指正方向）。

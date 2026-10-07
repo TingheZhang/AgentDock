@@ -26,7 +26,12 @@ write a registry.
   units.
 - Current board ports are registry data. Discover names, ports, bind addresses,
   and project paths from `ports.json`; do not hard-code a project name.
-- Recovery is project-scoped in the current supervisor. Inspect the service
+- Recovery is project-scoped in the current supervisor. The 2026-10-06 read-only
+  unit/source check found the effective `Type=simple` and current `ExecStart`;
+  `heal_project` calls `stop <name>` then `start <name>`. This is source and
+  unit evidence, not a fault-drill guarantee. With `Restart=always` and
+  `KillMode=control-group`, stopping the supervisor/unit can affect the whole
+  service group, so zero interruption cannot be claimed. Inspect the service
   tool and restart only the affected project when that is authorized.
 - Notes are Markdown source files. The main knowledge SQLite database is
   `wiki/knowledge.db`; each Wiki also has its own `index.db` in its Wiki data
@@ -63,3 +68,5 @@ write a registry.
 - Use [scripts/health_check.py](scripts/health_check.py) for transport and
   protocol checks. It is read-only and does not replace page, task ownership,
   or browser acceptance.
+
+

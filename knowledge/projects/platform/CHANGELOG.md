@@ -58,7 +58,7 @@ tags:
 ### 2026-10-06 [wiki 纳入 git 纳管 + 陈旧页机制根治] by CodeBuddy Agent
 - **背景与原因 (Context / Why)**:
   1. wiki 目录完全不在版本控制中，ingest 覆盖只能靠 `wiki_sync.py backup` 手工回滚，错误知识无法追溯引入时间与责任人。
-  2. 发现二次根因：上一轮存储层纠错（`a015686`）写的是指代歧义句「该路径本身才是 NFS」，LLM 摘要层忠实继承，产出「平台仓库位于 NFS 路径 `/mnt/zhangth/projects`」的错误实体页。成因链可复现：`歧义源 → LLM 继承 → 错误实体页 → ingest 不重写 → 长期驻留`。
+  2. 发现二次根因：上一轮存储层纠错（`a015686`）写的是指代歧义句「该路径本身才是 NFS」，LLM 摘要层忠实继承，产出「平台仓库位于 NFS 路径 `<legacy-projects-path>`」的错误实体页。成因链可复现：`歧义源 → LLM 继承 → 错误实体页 → ingest 不重写 → 长期驻留`。
   3. 进一步查明 `wiki/log.md` 显示 `wrote 34 pages` 而总页数 57 —— **ingest 是增量合并，不重写未命中的页面**，源改对了旧页仍长期驻留。
 - **改动清单 (What Changed)**:
   1. `$PLATFORM_ROOT/wiki` 建为**独立 git 仓库**（首次提交 `4a44572`）：跟踪 `raw/sources/*.md`（真源）、`wiki/**/*.md`（61 个摘要页）、`_wiki_engines/wiki-sources.json`；`.gitignore` 排除 `*.db` / `*.db-wal` / `*.db-shm`。
@@ -69,7 +69,7 @@ tags:
   6. `platform-core/AGENTS.md`：布局表加「In git」列，标出 platform-core 无 git 而 wiki 为独立仓库。
 - **验证结果 (Verification)**:
   - **陈旧页已改写**：version 3(57) → 5(59) → **6(61) 页**；`entities/nfs-mnt-share.md` 与 `entities/本地盘-data.md` mtime 由 13:55 更新为 14:49。
-  - **残留扫描负控**：全 wiki grep 命中 9 条，逐条判定全为合规内容（纠错记录本身、链接列表、核对命令）；负控样本「平台仓库在 /mnt/zhangth/projects（NFS）」未标注时命中数 1，证明过滤器未失效。
+  - **残留扫描负控**：全 wiki grep 命中 9 条，逐条判定全为合规内容（纠错记录本身、链接列表、核对命令）；负控样本「平台仓库在 <legacy-projects-path>（NFS）」未标注时命中数 1，证明过滤器未失效。
   - **gitignore 负控**：`git check-ignore` 逐文件验证 5 个数据库文件全部忽略、3 类内容未被误忽略；`git diff --cached` 中 `.db` 文件数 = 0。
   - **git 功能实测**：改动摘要页 → `git diff --stat` 检出 2 insertions → `git checkout --` 回滚后与原文一致；`touch knowledge.db-wal` 后工作区仍干净。
   - **盘位核对**：`df -Th $PLATFORM_ROOT/wiki` → `/dev/sdb ext4`，符合铁律 9。

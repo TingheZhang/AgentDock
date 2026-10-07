@@ -1,5 +1,9 @@
 # 专家审阅入口（START HERE）
 
+> **历史材料：** 本文件保留当时的审阅入口和证据，不是当前运行命令或
+> 当前部署状态的权威来源。当前操作请读仓库根部 `SKILL.md`、`README.md`
+> 和 `docs/OPERATIONS.md`。
+
 > 2026-10-05 · 服务器 `<USER>@<LAN_IP>`
 > 登录后第一条命令：`cd $PLATFORM_ROOT/platform/review && ls`
 

@@ -233,7 +233,8 @@ def self_test():
     base = f"http://127.0.0.1:{server.server_port}"
     try:
         positive = run([base + "/ok"], base + "/mcp", None, [], 2)
-        negative = run([base + "/bad", base + "/down"], None, None, [], 2)
+        bad = run([base + "/bad"], None, None, [], 2)
+        down = run([base + "/down"], None, None, [], 2)
         mcp_negative = run([base + "/ok"], base + "/mcp-bad", None, [], 2)
         no_session = run([], base + "/mcp-no-session", None, [], 2)
         no_notify = run([], base + "/mcp-no-notify", None, [], 2)
@@ -241,14 +242,15 @@ def self_test():
         null_result = run([], base + "/mcp-null-result", None, [], 2)
         bad_jsonrpc = run([], base + "/mcp-bad-jsonrpc", None, [], 2)
         assert positive["ok"], positive
-        assert not negative["ok"], negative
+        assert not bad["ok"], bad
+        assert not down["ok"], down
         assert not mcp_negative["ok"], mcp_negative
         assert not no_session["ok"], no_session
         assert not no_notify["ok"], no_notify
         assert not empty_tools["ok"], empty_tools
         assert not null_result["ok"], null_result
         assert not bad_jsonrpc["ok"], bad_jsonrpc
-        return {"positive": positive, "negative": negative, "mcp_negative": mcp_negative,
+        return {"positive": positive, "bad": bad, "down": down, "mcp_negative": mcp_negative,
                 "no_session": no_session, "no_notify": no_notify, "empty_tools": empty_tools,
                 "null_result": null_result, "bad_jsonrpc": bad_jsonrpc, "ok": True}
     finally:

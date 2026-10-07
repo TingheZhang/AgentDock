@@ -46,7 +46,7 @@ tags:
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:<PORT>/   # 期望 200
 curl -s http://<LAN_IP>:<PORT>/ | grep -c panel             # 面板项目期望 >0
-python3 scripts/health_check.py --json --deep                      # 期望 ok=true
+python3 scripts/health_check.py --json --url http://127.0.0.1:<PORT>/   # 目标需显式提供
 ```
 
 **每条新断言配一个负控**：把它指向错误前提跑一次，必须报 FAIL 才算有效验证。
@@ -69,11 +69,11 @@ python3 scripts/health_check.py --json --deep                      # 期望 ok=t
 ## 并发安全
 
 - 平台仓库在 `$PLATFORM_ROOT/platform`，该目录在 **ext4**（`/dev/sdb`）上。
-  `/mnt/zhangth/projects` 是指向它的**软链**，本身也落在 ext4，**不是 NFS 路径**；
-  真正的 NFS 是它的**上级目录** `/mnt/zhangth`（nfs4，`<LAN_IP_2>:/Backup`）。
+  `<legacy-projects-path>` 是指向它的**软链**，本身也落在 ext4，**不是 NFS 路径**；
+  真正的 NFS 是它的**上级目录** `<nfs-mount>`（nfs4，`<LAN_IP_2>:/Backup`）。
   仓库**用 worktree 隔离**：共用一个工作目录时，一个 agent 切分支会改变别人
   看到的文件。worktree 在这里是为了**并发隔离**，与 NFS 性能无关。
-  核对方式：`df -Th /mnt/zhangth /mnt/zhangth/projects $PLATFORM_ROOT/platform`
+  核对方式：`df -Th <nfs-mount> <legacy-projects-path> $PLATFORM_ROOT/platform`
   —— 第二、三行应显示 ext4。
 - 笔记在 `$PLATFORM_ROOT/memory`，**入 git 纳管**（source of truth）。
   改完立刻提交，否则回滚或clean checkout 会丢内容。

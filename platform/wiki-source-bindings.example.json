@@ -1,5 +1,5 @@
 {
-  "comment": "声明哪些笔记是wiki 的输入源。用于 health_check 的 --deep 检测笔记比wiki 新（该重跑 ingest）。wiki 与笔记之间没有自动传导，改了笔记必须手动跑 wiki_sync.py sync。",
+  "comment": "声明哪些笔记是 wiki 的输入源。健康检查只做显式目标的传输/协议诊断；wiki 与笔记之间没有自动传导，改了笔记必须按授权执行 ingest。",
   "bindings": [
     {
       "wiki_id": "<WIKI_ID>",
