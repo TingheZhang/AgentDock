@@ -60,7 +60,8 @@ edit outbox state or change owner/endpoint binding.
 means the configured gate confirmed receipt. The receiving client uses its
 own deployed credential to read the sender's handoff by `event_id` through the
 configured loopback gate GET endpoint, then verifies sender owner and handoff
-content. Parse only the `token` field from the owner-only JSON token file and
+content. Authenticated clients share the configured project's ID-based read
+scope; `recipient` is handoff metadata, not an access-control list. Parse only the `token` field from the owner-only JSON token file and
 add it as a Bearer header in the client; never send the whole file or print
 the token.
 
