@@ -43,3 +43,11 @@
   possible shared-dashboard impact.
 - README now gives the concrete WorkBuddy path
   `~/.workbuddy/skills/platform-core-ops/` and quotes placeholder URLs.
+## 2026-11-07 — structured handoff export
+
+- Added the generic loopback structured-handoff gate adapter, configuration
+  example, focused tests, handoff reference, and sanitized acceptance summary.
+- Updated the platform skill to discover structured handoff routing without
+  granting external-send or production-mutation permission.
+- Export contains no deployment credentials, tokens, databases, raw sessions,
+  runtime logs, private host addresses, or absolute user paths.

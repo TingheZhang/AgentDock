@@ -2,9 +2,10 @@
 name: platform-core-ops
 description: >-
   Operate and diagnose a multi-project research platform with Backlog boards,
-  a read-only notes and Wiki reader, and project-scoped code-graph snapshots.
-  Use for platform health checks, project registration, service wiring, and
-  deployment verification; do not use it as permission to mutate production.
+  a read-only notes and Wiki reader, project-scoped code-graph snapshots, and
+  approved structured session-handoff transport discovery. Use for platform
+  health checks, project registration, service wiring, deployment verification,
+  or handoff routing; do not use it as permission to mutate production.
 ---
 
 # Platform core operations
@@ -26,6 +27,10 @@ write a registry.
   units.
 - Current board ports are registry data. Discover names, ports, bind addresses,
   and project paths from `ports.json`; do not hard-code a project name.
+- The project context map is derived from the active registry and current
+  project roots; it is not a second Backlog or registry source. Keep the task
+  directory, platform code root, notes/Wiki roots, and code-graph scope
+  distinct.
 - Recovery is project-scoped in the current supervisor. The 2026-10-06 read-only
   unit/source check found the effective `Type=simple` and current `ExecStart`;
   `heal_project` calls `stop <name>` then `start <name>`. This is source and
@@ -56,6 +61,20 @@ write a registry.
    deployment evidence, produced artifact/version, and browser or API
    acceptance evidence as applicable. A task status or merge alone is not a
    result. Append the project CHANGELOG according to its contract.
+6. For repeatable context checks, use the platform's `project_context.py`
+   commands with the actual project discovered from the registry. The CLI
+   resolves project/context roots from the registry; do not invent a second
+   root flag. `map` reports entry paths; `provenance` separates inherited
+   source from decision status; `snapshot` writes a versioned, bounded
+   SHA-256 manifest; `check` compares it without writing, ingesting, or
+   rebaselining. Missing baseline, permissions, or unavailable GUI evidence
+   must remain `NOT_VERIFIED`, never a green result. Do not follow symlinks or
+   include runtime state, tokens, large data, results, or lockbox files.
+7. For structured handoff discovery, read
+   [references/structured-handoff.md](references/structured-handoff.md) only
+   when the request concerns the deployed handoff transport. It documents the
+   installed entrypoints and safety boundary; it does not authorize enqueue,
+   resend, service changes, or external sharing.
 
 ## References
 
@@ -68,5 +87,8 @@ write a registry.
 - Use [scripts/health_check.py](scripts/health_check.py) for transport and
   protocol checks. It is read-only and does not replace page, task ownership,
   or browser acceptance.
+- Read [references/project-context.md](references/project-context.md) when
+  building an entry map, recording historical decision provenance, or running
+  the repeatable context snapshot/check workflow.
 
 

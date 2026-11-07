@@ -1,0 +1,17 @@
+{
+  "root": "/srv/ai-memory-handoff",
+  "data": "/srv/ai-memory-handoff/data",
+  "credentials": "/srv/ai-memory-handoff/credentials",
+  "ledger": "/srv/ai-memory-handoff/state/gate-ledger.json",
+  "audit": "/srv/ai-memory-handoff/state/gate-audit.jsonl",
+  "backend_url": "http://127.0.0.1:18080/mcp",
+  "bind": "127.0.0.1",
+  "port": 18081,
+  "workspace": "platform",
+  "project": "handoffs",
+  "root_token_file": "/srv/ai-memory-handoff/data/auth-tokens/default",
+  "clients": [
+    {"owner": "client-a", "token_file": "/srv/ai-memory-handoff/credentials/client-a.json"},
+    {"owner": "client-b", "token_file": "/srv/ai-memory-handoff/credentials/client-b.json"}
+  ]
+}
