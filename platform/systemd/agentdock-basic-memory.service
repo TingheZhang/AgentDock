@@ -1,6 +1,6 @@
 [Unit]
 Description=Basic Memory MCP 语义笔记服务（8765）
-Documentation=file://$PLATFORM_ROOT/platform/review/memory-tools-config.md
+Documentation=file://$PLATFORM_ROOT/docs/OPERATIONS.md
 After=network-online.target
 Wants=network-online.target
 
