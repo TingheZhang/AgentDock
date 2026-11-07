@@ -6,7 +6,7 @@
 
 ```bash
 systemctl --user start|stop|restart|status agentdock-platform.target
-systemctl --user list-timers agentdock-healthcheck.timer   # 看下次自愈检查
+systemctl --user list-timers <local-healthcheck-timer>   # 看下次自愈检查（如已配置）
 tail -f $LOG_DIR/healthcheck.log                # 自愈记录
 ```
 
@@ -33,7 +33,7 @@ ss -tlnp | grep -E '6420|6421|6422|8421|8765'   # 一次看全
 旧 oneshot 盲区是历史背景：旧脚本用 nohup 拉起子进程后自己退出，systemd
 可能仍报 `active`，子进程崩溃也不会被 unit 感知。它不是当前 unit 的行为保证。
 
-补偿机制：`agentdock-healthcheck.timer` 每 2 分钟检查五个端口，DOWN 就重启对应单元。
+补偿机制：可由本地调度器每 2 分钟检查五个端口，DOWN 就重启对应单元；本包不自带 timer。
 日志在 `$LOG_DIR/healthcheck.log`。
 
 **判据：`systemctl is-active` 说 active 不等于服务活着。以端口为准。**
@@ -93,15 +93,29 @@ git status --short   # 必须为空
 ## 部署到新机器
 
 ```bash
-# 1. 单元
-cp $PLATFORM_ROOT/platform/systemd/agentdock-* ~/.config/systemd/user/
-chmod +x ~/.config/systemd/user/agentdock-healthcheck.sh
-# 2. 开机自启（关键，默认为 no）
+# 1. 先按实际机器渲染并核对模板
+#    将 $PLATFORM_ROOT、$HOME_DIR、$TDAM_DIR、$NODE_BIN 等占位符替换为
+#    真实绝对路径；不要把这些占位符直接交给 systemd。
+envsubst < $PLATFORM_ROOT/platform/systemd/agentdock-backlog.service > /tmp/agentdock-backlog.service
+envsubst < $PLATFORM_ROOT/platform/systemd/agentdock-basic-memory.service > /tmp/agentdock-basic-memory.service
+envsubst < $PLATFORM_ROOT/platform/systemd/agentdock-knowledge.service > /tmp/agentdock-knowledge.service
+envsubst < $PLATFORM_ROOT/platform/systemd/agentdock-platform.target > /tmp/agentdock-platform.target
+envsubst < $PLATFORM_ROOT/platform/systemd/agentdock-readonly.service > /tmp/agentdock-readonly.service
+envsubst < $PLATFORM_ROOT/platform/systemd/agentdock-healthcheck.service > /tmp/agentdock-healthcheck.service
+cp $PLATFORM_ROOT/platform/systemd/agentdock-healthcheck.sh /tmp/agentdock-healthcheck.sh
+chmod +x /tmp/agentdock-healthcheck.sh
+grep -nE '\$[A-Z_][A-Z0-9_]*' /tmp/agentdock-*.service /tmp/agentdock-*.target && exit 1 || true
+# 2. 停止旧的同职能 unit 后安装渲染结果
+#    先核对 unit 名称和状态；只停旧 unit，再启用对应的 AgentDock unit。
+systemctl --user stop <old-platform-target> <old-reader-unit> <old-healthcheck-unit>
+install -m 0644 /tmp/agentdock-*.service /tmp/agentdock-*.target ~/.config/systemd/user/
+install -m 0755 /tmp/agentdock-healthcheck.sh ~/.config/systemd/user/
+# 3. 开机自启（关键，默认为 no）
 loginctl enable-linger $USER
-# 3. 启用
+# 4. 启用
 systemctl --user daemon-reload
-systemctl --user enable --now agentdock-platform.target agentdock-healthcheck.timer
-# 4. 校验
+systemctl --user enable --now agentdock-platform.target
+# 5. 校验
 systemd-analyze verify ~/.config/systemd/user/agentdock-backlog.service
 ```
 

@@ -31,7 +31,7 @@
 ## 2026-10-06 — unit boundary clarification
 
 - Added sanitized read-only supervisor/unit evidence at
-  `docs/review/2026-10-06-supervisor-verification.md`, including effective
+  the prior review artifact, including effective
   `Type=simple`/`ExecStart`, MainPID association, stop/start and signal/exit
   branches, and source hashes with the limitation that disk hashes do not
   prove every running child loaded that revision.
@@ -58,3 +58,11 @@
   for enqueue, ACK/retry, status, owner binding, and gate readback workflows.
 - Disabled ambient HTTP proxy use for loopback gate calls and documented
   generic token-file, workspace preparation, tunnel, and bounded-worker rules.
+
+## 2026-11-07 - AgentDock debranding follow-up
+
+- Removed the remaining legacy vendor-specific public paths and historical
+  artifacts; retained the original LICENSE attribution unchanged.
+- Clarified that systemd unit templates must be rendered with real absolute
+  paths before installation, and documented the old-unit-to-AgentDock-unit
+  migration order.

@@ -1,6 +1,6 @@
 [Unit]
 Description=AgentDock 科研协作平台（Backlog + 知识层 + 笔记）
-Documentation=file://$PLATFORM_ROOT/platform/review/platform-review-brief.md
+Documentation=file://$PLATFORM_ROOT/docs/OPERATIONS.md
 Wants=agentdock-backlog.service agentdock-knowledge.service agentdock-basic-memory.service
 After=agentdock-backlog.service agentdock-knowledge.service agentdock-basic-memory.service
 

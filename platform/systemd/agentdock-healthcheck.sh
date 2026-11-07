@@ -1,7 +1,7 @@
 #!/bin/bash
 # 五个端口 + 关键端点的存活检查。
 # oneshot 单元的子进程崩溃时 systemd 察觉不到（脚本已退出，unit 仍 active），
-# 本脚本由 agentdock-healthcheck.timer 每 2 分钟调用，异常则重启对应单元。
+# Optional local scheduler (systemd timer or cron) invokes this check; the package does not include a timer.
 LOG=$LOG_DIR/healthcheck.log
 ts() { date '+%Y-%m-%d %H:%M:%S'; }
 port() { ss -tln 2>/dev/null | grep -q "$1 "; }
