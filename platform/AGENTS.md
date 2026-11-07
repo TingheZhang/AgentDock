@@ -59,11 +59,11 @@ $PLATFORM_ROOT
 
 | Port | Serves | Unit |
 |---|---|---|
-| 6420 / 6422 / 6423 | the three project boards (+ knowledge panel) | `vcc-backlog` |
-| 6421 | aggregate dashboard | `vcc-backlog` |
-| 6424 | knowledge reader (wiki + notes) | `vcc-readonly` |
-| 8421 | MemoryKnowledge | `vcc-knowledge` |
-| 8765 | Basic Memory MCP | `vcc-basic-memory` |
+| 6420 / 6422 / 6423 | the three project boards (+ knowledge panel) | `agentdock-backlog` |
+| 6421 | aggregate dashboard | `agentdock-backlog` |
+| 6424 | knowledge reader (wiki + notes) | `agentdock-readonly` |
+| 8421 | MemoryKnowledge | `agentdock-knowledge` |
+| 8765 | Basic Memory MCP | `agentdock-basic-memory` |
 
 Quick health check, including note reconciliation:
 
@@ -103,7 +103,7 @@ hand-maintained truth), `wiki/**/*.md` (the generated summary pages), and
 ```bash
 cd $PLATFORM_ROOT/wiki
 git diff                # see what an ingest changed, line by line
-git log --oneline -- "<TEAM_SLUG>/vcc/<WIKI_ID>/raw/sources/ops-manual.md"
+git log --oneline -- "<TEAM_SLUG>/agentdock/<WIKI_ID>/raw/sources/ops-manual.md"
 git checkout --<path>   # roll back one summary page
 ```
 
@@ -140,7 +140,7 @@ loss.)
 |---|---|
 | `platform/ports.json` | every consumer reads it; a bad entry breaks the platform |
 | `platform/www/index.html` | generated — use `bb-ports.sh refresh` |
-| `~/.config/systemd/user/vcc-*.service` | desyncs from the repo copy |
+| `~/.config/systemd/user/agentdock-*.service` | desyncs from the repo copy |
 | `memory/**`, `wiki/**/*.md` | research content, not platform code |
 | `wiki/**/*.db*` | LIVE wiki database, rewritten on every ingest |
 | `state/**` | runtime, regenerated |

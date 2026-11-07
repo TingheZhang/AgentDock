@@ -1,12 +1,12 @@
-# VCC 平台运维手册
+# AgentDock 平台运维手册
 
 > 2026-10-05 实测。四项需求全部落地，服务已托管 systemd，开机自启 + 崩溃自愈。
 
 ## 一键操作
 
 ```bash
-systemctl --user start|stop|restart|status vcc-platform.target
-systemctl --user list-timers vcc-healthcheck.timer   # 看下次自愈检查
+systemctl --user start|stop|restart|status agentdock-platform.target
+systemctl --user list-timers agentdock-healthcheck.timer   # 看下次自愈检查
 tail -f $LOG_DIR/healthcheck.log                # 自愈记录
 ```
 
@@ -14,11 +14,11 @@ tail -f $LOG_DIR/healthcheck.log                # 自愈记录
 
 | 端口 | 服务 | 单元 | 启动方式 |
 |---|---|---|---|
-| 6420 | Backlog 写作侧 | vcc-backlog.service | bb-ports.sh |
-| 6421 | Backlog 聚合页 | vcc-backlog.service | bb-ports.sh |
-| 6422 | Backlog VCC 项目 | vcc-backlog.service | bb-ports.sh |
-| 8421 | MemoryKnowledge | vcc-knowledge.service | ks.sh |
-| 8765 | Basic Memory MCP | vcc-basic-memory.service | 直接跑二进制 |
+| 6420 | Backlog 写作侧 | agentdock-backlog.service | bb-ports.sh |
+| 6421 | Backlog 聚合页 | agentdock-backlog.service | bb-ports.sh |
+| 6422 | Backlog AgentDock 项目 | agentdock-backlog.service | bb-ports.sh |
+| 8421 | MemoryKnowledge | agentdock-knowledge.service | ks.sh |
+| 8765 | Basic Memory MCP | agentdock-basic-memory.service | 直接跑二进制 |
 
 ```bash
 ss -tlnp | grep -E '6420|6421|6422|8421|8765'   # 一次看全
@@ -26,14 +26,14 @@ ss -tlnp | grep -E '6420|6421|6422|8421|8765'   # 一次看全
 
 ## 当前 unit 与历史 oneshot 说明
 
-当前 `vcc-backlog.service` 使用常驻 `Type=simple` supervisor，并按项目隔离
-恢复；`vcc-knowledge.service` 直接持有构建后的知识服务进程。实际 unit 仍需用
+当前 `agentdock-backlog.service` 使用常驻 `Type=simple` supervisor，并按项目隔离
+恢复；`agentdock-knowledge.service` 直接持有构建后的知识服务进程。实际 unit 仍需用
 `systemctl --user cat/show` 核对，`is-active` 不能代替 HTTP 探测。
 
 旧 oneshot 盲区是历史背景：旧脚本用 nohup 拉起子进程后自己退出，systemd
 可能仍报 `active`，子进程崩溃也不会被 unit 感知。它不是当前 unit 的行为保证。
 
-补偿机制：`vcc-healthcheck.timer` 每 2 分钟检查五个端口，DOWN 就重启对应单元。
+补偿机制：`agentdock-healthcheck.timer` 每 2 分钟检查五个端口，DOWN 就重启对应单元。
 日志在 `$LOG_DIR/healthcheck.log`。
 
 **判据：`systemctl is-active` 说 active 不等于服务活着。以端口为准。**
@@ -94,24 +94,24 @@ git status --short   # 必须为空
 
 ```bash
 # 1. 单元
-cp $PLATFORM_ROOT/platform/systemd/vcc-* ~/.config/systemd/user/
-chmod +x ~/.config/systemd/user/vcc-healthcheck.sh
+cp $PLATFORM_ROOT/platform/systemd/agentdock-* ~/.config/systemd/user/
+chmod +x ~/.config/systemd/user/agentdock-healthcheck.sh
 # 2. 开机自启（关键，默认为 no）
 loginctl enable-linger $USER
 # 3. 启用
 systemctl --user daemon-reload
-systemctl --user enable --now vcc-platform.target vcc-healthcheck.timer
+systemctl --user enable --now agentdock-platform.target agentdock-healthcheck.timer
 # 4. 校验
-systemd-analyze verify ~/.config/systemd/user/vcc-backlog.service
+systemd-analyze verify ~/.config/systemd/user/agentdock-backlog.service
 ```
 
 ## 排错
 
 | 症状 | 排查 |
 |---|---|
-| 端口不通但 is-active=active | 看 healthcheck.log，等 2 分钟或手动 `systemctl --user start vcc-healthcheck.service` |
+| 端口不通但 is-active=active | 看 healthcheck.log，等 2 分钟或手动 `systemctl --user start agentdock-healthcheck.service` |
 | `systemctl stop` 收不掉进程 | 旧的手动进程不在 unit cgroup，按端口 kill：`P=\$(ss -tlnp\|grep ':8765 '\|grep -o 'pid=[0-9]*'\|cut -d= -f2); kill \$P` |
 | 8765 报 `Errno 101` | `HF_ENDPOINT` 没设。systemd 单元里已设，手动启动必须带 |
-| 8421 返 404 wiki not found | 先查 `x-tdai-service-id` 是否填错（真值 `<TEAM_SLUG>`，不是 team_id `vcc`） |
+| 8421 返 404 wiki not found | 先查 `x-tdai-service-id` 是否填错（真值 `<TEAM_SLUG>`，不是 team_id `agentdock`） |
 | git 命令在 NFS 上极慢 | 确认 `.git` 是文件不是目录（separate-git-dir 已配）；`cat .git` 看路径 |
 | NFS 目录 git 提交慢 | 提交前确认 `$GIT_DIR` 存在，git 目录不在 NFS 上 |

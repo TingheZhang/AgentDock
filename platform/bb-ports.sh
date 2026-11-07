@@ -29,7 +29,7 @@ AGGREGATE="$HERE/bb-aggregate.py"
 KB_PROXY="$HERE/kb-proxy.py"
 # Where the knowledge panel is rendered. Kept in one place so the boards and
 # the reader can never drift; override to point at a different instance.
-READER_URL="${VCC_READER_URL:-http://127.0.0.1:6424}"
+READER_URL="${AGENTDOCK_READER_URL:-http://127.0.0.1:6424}"
 WWW="$HERE/www"
 STATE="$HERE/.state"
 LOGDIR="$STATE/logs"

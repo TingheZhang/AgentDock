@@ -64,7 +64,7 @@ worktree.
 
 Use the helper, which handles everything below:
 
-    $PROJECT_DIR/example-project/vcc-wt.sh add <who> <task-id>
+    $PROJECT_DIR/example-project/agentdock-wt.sh add <who> <task-id>
 
 That creates `$HOME_DIR/wt-<who>` on branch `agent/<who>-<task-id>`, and
 handles three things a plain `git worktree add` does not:
@@ -78,16 +78,16 @@ handles three things a plain `git worktree add` does not:
    from `$PLATFORM_ROOT/platform/ports.json` only. The worktree is registered
    there so your tasks show up under "<STUDY_GROUP> (agent worktrees)". No web UI
    port is assigned -- the card lists your task titles inline instead.
-3. **Refusing a destructive remove.** `vcc-wt.sh remove` will not delete a
+3. **Refusing a destructive remove.** `agentdock-wt.sh remove` will not delete a
    worktree that has uncommitted work, and it keeps the branch when it was
    never merged into `main`.
 
 Other subcommands:
 
-    vcc-wt.sh list                # all worktrees, branch, and dirty state
-    vcc-wt.sh check <who>         # preflight: symlinks resolve? uncommitted work?
-    vcc-wt.sh sync                # re-register live worktrees, prune stale entries
-    vcc-wt.sh remove <who>        # after the branch is merged or abandoned
+    agentdock-wt.sh list                # all worktrees, branch, and dirty state
+    agentdock-wt.sh check <who>         # preflight: symlinks resolve? uncommitted work?
+    agentdock-wt.sh sync                # re-register live worktrees, prune stale entries
+    agentdock-wt.sh remove <who>        # after the branch is merged or abandoned
 
 Worktrees live on local disk (`/data`), never on NFS, for the git-metadata
 reason above. The bulk data they point at stays on NFS, which is fine --
@@ -103,7 +103,7 @@ you get a linear history with no review point in it. Check before merging:
 
     git -C $PROJECT_DIR/example-project rev-parse --abbrev-ref HEAD   # must say main
 
-**Branches left behind after `vcc-wt.sh remove`.** The script deletes a branch
+**Branches left behind after `agentdock-wt.sh remove`.** The script deletes a branch
 only when it was merged into `main`; otherwise it keeps the branch and tells
 you so, because deleting an unmerged branch is how real work gets lost. Test
 and demo agents therefore leave `agent/<who>-<task-id>` branches behind. That
@@ -120,13 +120,13 @@ directory from the working directory. Consequences:
   registered) but NOT in the main working copy until the branch carrying it
   is merged into `main`.
 - Do not treat the main copy's task list as the whole truth while you work.
-  `vcc-wt.sh list` shows which worktrees exist and what each holds.
+  `agentdock-wt.sh list` shows which worktrees exist and what each holds.
 
 ## The review workflow
 
 1. Take a task from Backlog.md (`backlog task list`) and get a worktree for it:
 
-       $PROJECT_DIR/example-project/vcc-wt.sh add <who> <task-id>
+       $PROJECT_DIR/example-project/agentdock-wt.sh add <who> <task-id>
        cd $HOME_DIR/wt-<who>
 
    That puts you on branch `agent/<who>-<task-id>` with the data symlinks and
@@ -201,7 +201,7 @@ Rules that keep attribution correct:
   not lost, but nobody browsing your project will see them.
 - To add a note, write the `.md` file (it is the source of truth) and let
   the index catch up. Do not edit the SQLite index.
-- The reader is a separate service (port 6424, unit `vcc-readonly`). If it
+- The reader is a separate service (port 6424, unit `agentdock-readonly`). If it
   is down, the board still works and the panel is simply omitted -- report
   that as "knowledge unavailable", not as "the platform is broken".
 

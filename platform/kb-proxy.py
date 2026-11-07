@@ -12,7 +12,7 @@ HTML documents splice a panel in before </body>.
 
 Design constraints
 ------------------
-- The panel is SERVER-rendered by vcc-readonly /api/panel and injected as
+- The panel is SERVER-rendered by agentdock-readonly /api/panel and injected as
   one string. No client-side fetch, so the panel still appears if the reader
   is down... except it cannot, since the HTML comes from the reader. The
   fallback is that a reader outage degrades to "no panel", never to a broken
@@ -26,7 +26,7 @@ Design constraints
   knowledge is strictly better than a board that errors.
 
 Usage:
-    kb-proxy.py --port 6422 --bind 0.0.0.0 --project vcc-example-project
+    kb-proxy.py --port 6422 --bind 0.0.0.0 --project agentdock-example-project
                 [--reader http://127.0.0.1:6424]
 """
 import argparse
@@ -61,7 +61,7 @@ def fetch_panel(reader, project):
     url = "%s/api/panel?project=%s" % (reader.rstrip("/"), urllib.parse.quote(project))
     body = ""
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "vcc-kb-proxy/1"})
+        req = urllib.request.Request(url, headers={"User-Agent": "agentdock-kb-proxy/1"})
         with urllib.request.urlopen(req, timeout=6) as r:
             if r.status == 200:
                 body = r.read().decode("utf-8", "replace")
@@ -102,7 +102,7 @@ def _is_ws_upgrade(headers):
 
 
 class Handler(http.server.BaseHTTPRequestHandler):
-    server_version = "vcc-kb-proxy/1.1"
+    server_version = "agentdock-kb-proxy/1.1"
     protocol_version = "HTTP/1.1"
 
     # Injected by the server object.

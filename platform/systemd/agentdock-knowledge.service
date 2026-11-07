@@ -45,7 +45,7 @@ TimeoutStopSec=30
 
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=vcc-knowledge
+SyslogIdentifier=agentdock-knowledge
 
 [Install]
 WantedBy=default.target

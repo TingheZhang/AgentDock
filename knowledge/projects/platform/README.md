@@ -1,7 +1,7 @@
 ---
 title: README
 type: note
-permalink: vcc-notes/projects/platform/readme
+permalink: agentdock-notes/projects/platform/readme
 ---
 
 # platform

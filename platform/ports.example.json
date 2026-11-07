@@ -37,7 +37,7 @@
   ],
   "projects": [
     {
-      "name": "vcc-example-project",
+      "name": "agentdock-example-project",
       "path": "$PROJECT_DIR/example-project",
       "group": "<STUDY_GROUP>",
       "ui_port": 6422,

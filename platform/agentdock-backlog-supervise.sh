@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# vcc-backlog-supervise.sh -- supervise Backlog.md project boards and dashboard
+# agentdock-backlog-supervise.sh -- supervise Backlog.md project boards and dashboard
 # with isolated, per-project self-healing (eliminating cascading whole-platform restarts).
 #
 # Architecture:

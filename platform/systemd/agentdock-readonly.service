@@ -1,0 +1,17 @@
+[Unit]
+Description=AgentDock readonly wiki + notes reader
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=$PLATFORM_ROOT/platform
+ExecStart=/usr/bin/python3 $PLATFORM_ROOT/platform/agentdock-readonly.py
+Environment=AGENTDOCK_READONLY_BIND=0.0.0.0
+Environment=AGENTDOCK_READONLY_PORT=6424
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:/tmp/agentdock-readonly.log
+StandardError=append:/tmp/agentdock-readonly.log
+
+[Install]
+WantedBy=default.target

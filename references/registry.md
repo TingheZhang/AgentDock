@@ -5,7 +5,7 @@ platform root. Define it explicitly, for example:
 
 ```bash
 export PLATFORM_ROOT='<platform-root>'
-export VCC_REGISTRY="$PLATFORM_ROOT/platform/ports.json"
+export AGENTDOCK_REGISTRY="$PLATFORM_ROOT/platform/ports.json"
 ```
 
 Read the file before editing. Confirm the project name, absolute task path,
@@ -19,7 +19,7 @@ obtain the user authorization required for that registry change. Preserve
 existing entries and concurrent work. Refresh generated dashboard output only
 through the installed platform command, and verify the actual HTTP endpoint.
 
-The current service target is `vcc-platform.target`. Do not infer unit names
+The current service target is `agentdock-platform.target`. Do not infer unit names
 from an old document; inspect `systemctl --user list-unit-files` and the live
 unit source. A single-project proxy refresh is preferable to a platform-wide
 restart when the installed tool supports it.

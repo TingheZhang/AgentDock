@@ -1,6 +1,6 @@
 # platform-core-ops
 
-The current `main` contains the repaired AgentDock/VCC integration and the
+The current `main` contains the repaired AgentDock integration and the
 installable `platform-core-ops` skill package. The skill installation consists
 of `SKILL.md`, `references/`, and `scripts/`; `tools/health_check.py` is a
 legacy compatibility entry point and is not part of the skill installation.
@@ -39,7 +39,7 @@ python scripts/health_check.py --self-test
 # Supply at least one real target; replace <TAILSCALE_IP> with the actual
 # configured address and quote URLs so shell metacharacters cannot redirect.
 # Repeat --url for loopback and each configured proxy/Tailscale address.
-python scripts/health_check.py --json --url "http://127.0.0.1:6422/" --url "http://<TAILSCALE_IP>:6422/" --mcp-url "http://127.0.0.1:8765/mcp" --unit vcc-readonly.service
+python scripts/health_check.py --json --url "http://127.0.0.1:6422/" --url "http://<TAILSCALE_IP>:6422/" --mcp-url "http://127.0.0.1:8765/mcp" --unit agentdock-readonly.service
 ```
 
 Older callers may run `python tools/health_check.py --deep`. That entry point

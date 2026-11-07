@@ -1,17 +1,17 @@
 ---
 title: example-project 项目知识归属说明
 tags:
-- vcc
+- agentdock
 - example-project
 - memory
-permalink: vcc-notes/projects/example-project/README
+permalink: agentdock-notes/projects/example-project/README
 ---
 
 # example-project 项目知识归属说明
 
 ## 这个目录的约定
 
-`MyTask/memory/projects/example-project/` 下的所有 `.md` 归 **VCC double-OOD
+`MyTask/memory/projects/example-project/` 下的所有 `.md` 归 **AgentDock double-OOD
 recombination** 项目所有，会自动出现在该项目的 Backlog.md 看板
 （http://<LAN_IP>:6422/ ）页内嵌的「本项目知识」面板里。
 
@@ -21,7 +21,7 @@ recombination** 项目所有，会自动出现在该项目的 Backlog.md 看板
 
 ```json
 {
-  "name": "vcc-example-project",
+  "name": "agentdock-example-project",
   "ui_port": 6422,
   "knowledge": {
     "note_subdirs": ["projects/example-project"],

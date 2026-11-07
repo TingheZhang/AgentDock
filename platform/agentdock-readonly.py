@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""vcc-readonly -- a small read-only web UI for the two data stores that
+"""agentdock-readonly -- a small read-only web UI for the two data stores that
 have no web front end of their own.
 
 Why this exists
@@ -50,25 +50,25 @@ KNOWLEDGE = "http://127.0.0.1:8421"
 API_PREFIX = "/v3"
 ENGINE_DIR = "$TDAM_DIR"
 NOTES_DIR = "$PLATFORM_ROOT/memory"
-CODEGRAPH_DIR = os.environ.get("VCC_CODEGRAPH_DIR", "$PLATFORM_ROOT/state/codegraph")
-REGISTRY = os.environ.get("VCC_REGISTRY", "$PLATFORM_ROOT/platform/ports.json")
-BACKLOG = os.environ.get("VCC_BACKLOG_BIN", "$HOME_DIR/.local/bin/backlog")
-BIND = os.environ.get("VCC_READONLY_BIND", "0.0.0.0")
-PORT = int(os.environ.get("VCC_READONLY_PORT", "6424"))
-SERVICE_ID = os.environ.get("VCC_TEAM_SERVICE_ID", "")
-TEAM_ID = os.environ.get("VCC_TEAM_ID", "")
+CODEGRAPH_DIR = os.environ.get("AGENTDOCK_CODEGRAPH_DIR", "$PLATFORM_ROOT/state/codegraph")
+REGISTRY = os.environ.get("AGENTDOCK_REGISTRY", "$PLATFORM_ROOT/platform/ports.json")
+BACKLOG = os.environ.get("AGENTDOCK_BACKLOG_BIN", "$HOME_DIR/.local/bin/backlog")
+BIND = os.environ.get("AGENTDOCK_READONLY_BIND", "0.0.0.0")
+PORT = int(os.environ.get("AGENTDOCK_READONLY_PORT", "6424"))
+SERVICE_ID = os.environ.get("AGENTDOCK_TEAM_SERVICE_ID", "")
+TEAM_ID = os.environ.get("AGENTDOCK_TEAM_ID", "")
 # `backlog task list` is a subprocess and costs ~0.25s per project, so a
 # page refresh used to fork one per project on every request. Memoise for a few
 # seconds: long enough to collapse a burst of refreshes, short enough that a
 # newly created task shows up quickly.
-TASK_CACHE_TTL = float(os.environ.get("VCC_TASK_CACHE_TTL", "5"))
+TASK_CACHE_TTL = float(os.environ.get("AGENTDOCK_TASK_CACHE_TTL", "5"))
 _TASK_CACHE = {}          # project name -> (expires_at, tasks, error)
 _TASK_CACHE_LOCK = threading.Lock()
 _TASK_GATES = {}          # project name -> Lock, for single-flight fetches
 # Public host used in links. Kept as a constant because both the page header
 # and the injected panel link out to sibling services; overridable so a
 # test or a future move does not need a code change.
-BIND_IP = os.environ.get("VCC_BIND_IP", "<LAN_IP>").split(",")[0].strip()
+BIND_IP = os.environ.get("AGENTDOCK_BIND_IP", "<LAN_IP>").split(",")[0].strip()
 
 
 def load_projects():
@@ -1458,7 +1458,7 @@ def page_html(title, body):
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "vcc-readonly/1.0"
+    server_version = "agentdock-readonly/1.0"
 
     def log_message(self, fmt, *args):
         sys.stderr.write("%s %s\n" % (self.address_string(), fmt % args))
@@ -1594,7 +1594,7 @@ class Handler(BaseHTTPRequestHandler):
 # --- code graph route (added by add_codegraph.py) ---
             if path == "/api/codegraph" or path == "/api/codegraph/":
                 name = (arg("name") or arg("project") or
-                        os.environ.get("VCC_CODEGRAPH_DEFAULT", "platform-core"))
+                        os.environ.get("AGENTDOCK_CODEGRAPH_DEFAULT", "platform-core"))
                 safe = "".join(ch for ch in name if ch.isalnum() or ch in "-_")
                 if not safe:
                     self._send(400, json.dumps({"error": "bad name"}))
@@ -1656,14 +1656,14 @@ def parse_args(argv=None):
     non-None argparse defaults would silently outrank the unit's env.
     """
     ap = argparse.ArgumentParser(
-        prog="vcc-readonly.py",
-        description="Read-only knowledge browser for the VCC platform "
+        prog="agentdock-readonly.py",
+        description="Read-only knowledge browser for the AgentDock platform "
                     "(default %s:%d)." % (BIND, PORT),
     )
     ap.add_argument("--bind", default=None,
-                    help="address to bind (default: $VCC_READONLY_BIND or %s)" % BIND)
+                    help="address to bind (default: $AGENTDOCK_READONLY_BIND or %s)" % BIND)
     ap.add_argument("--port", type=int, default=None,
-                    help="port to listen on (default: $VCC_READONLY_PORT or %d)" % PORT)
+                    help="port to listen on (default: $AGENTDOCK_READONLY_PORT or %d)" % PORT)
     ap.add_argument("--check", action="store_true",
                     help="validate configuration, print the resolved settings, "
                          "and exit without binding the port")
@@ -1673,8 +1673,8 @@ def parse_args(argv=None):
 def main(argv=None):
     args = parse_args(argv)
     # Env wins over CLI so the systemd unit keeps authority.
-    bind = os.environ.get("VCC_READONLY_BIND") or args.bind or BIND
-    port = int(os.environ.get("VCC_READONLY_PORT") or args.port or PORT)
+    bind = os.environ.get("AGENTDOCK_READONLY_BIND") or args.bind or BIND
+    port = int(os.environ.get("AGENTDOCK_READONLY_PORT") or args.port or PORT)
 
     if args.check:
         projects = load_projects()
@@ -1693,7 +1693,7 @@ def main(argv=None):
             sys.stderr.write(
                 "ERROR: cannot bind %s:%d -- port already in use\n" % (bind, port))
             sys.stderr.write(
-                "  another vcc-readonly is probably running; check:\n"
+                "  another agentdock-readonly is probably running; check:\n"
                 "    ss -tlnp | grep ':%d ' | grep -o 'pid=[0-9]*'\n" % port)
         elif exc.errno == errno.EACCES:
             # Ports below 1024 need privileges. Telling the user that another
@@ -1707,7 +1707,7 @@ def main(argv=None):
         sys.stderr.flush()
         return 1
     projects = load_projects()
-    sys.stderr.write(f"vcc-readonly listening on http://{bind}:{port}\n")
+    sys.stderr.write(f"agentdock-readonly listening on http://{bind}:{port}\n")
     sys.stderr.write(f"  wiki   <- {KNOWLEDGE}{API_PREFIX}  (team_id={TEAM_ID})\n")
     sys.stderr.write(f"  notes  <- {NOTES_DIR}\n")
     sys.stderr.write(f"  registry <- {REGISTRY}  ({len(projects)} projects)\n")

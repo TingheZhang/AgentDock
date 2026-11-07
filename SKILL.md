@@ -22,8 +22,8 @@ write a registry.
   the expected project or service identity.
 - The effective user unit is under `~/.config/systemd/user/`; a repository unit
   is only a source file until copied and reloaded by an authorized operation.
-- The current target is `vcc-platform.target`. The Backlog supervisor is
-  `vcc-backlog.service`; reader, knowledge, and Basic Memory are separate
+- The current target is `agentdock-platform.target`. The Backlog supervisor is
+  `agentdock-backlog.service`; reader, knowledge, and Basic Memory are separate
   units.
 - Current board ports are registry data. Discover names, ports, bind addresses,
   and project paths from `ports.json`; do not hard-code a project name.
