@@ -1,5 +1,6 @@
 import importlib.util,json,tempfile,unittest,threading,time
 from urllib.request import Request,urlopen
+from urllib.request import ProxyHandler
 from http.server import BaseHTTPRequestHandler,HTTPServer
 from pathlib import Path
 P=Path(__file__).with_name('structured_gate.py'); spec=importlib.util.spec_from_file_location('gate',P); gate=importlib.util.module_from_spec(spec); spec.loader.exec_module(gate)
@@ -18,7 +19,7 @@ class T(unittest.TestCase):
       def do_POST(self):
         got['accept']=self.headers.get('Accept'); got['body']=json.loads(self.rfile.read(int(self.headers['Content-Length']))); raw=json.dumps({'result':{'content':[{'text':json.dumps({'page_id':'p1'})}]}}).encode(); self.send_response(200); self.send_header('Content-Length',str(len(raw))); self.end_headers(); self.wfile.write(raw)
       def log_message(self,*a): pass
-    s=HTTPServer(('127.0.0.1',0),H); threading.Thread(target=s.serve_forever,daemon=True).start(); gate.BACKEND=f'http://127.0.0.1:{s.server_port}/mcp'; gate.ROOT_TOKEN='synthetic'; out=gate.backend('tools/call',{'_name':'memory_write_page','create_only':True}); self.assertEqual(out['page_id'],'p1'); self.assertIn('application/json',got['accept']); self.assertTrue(got['body']['params']['arguments']['create_only']); s.shutdown()
+    s=HTTPServer(('127.0.0.1',0),H); threading.Thread(target=s.serve_forever,daemon=True).start(); gate.BACKEND=f'http://127.0.0.1:{s.server_port}/mcp'; gate.ROOT_TOKEN='synthetic'; old=gate.build_opener; seen=[]; gate.build_opener=lambda *handlers: (seen.extend(handlers) or old(*handlers)); out=gate.backend('tools/call',{'_name':'memory_write_page','create_only':True}); self.assertEqual(out['page_id'],'p1'); self.assertIn('application/json',got['accept']); self.assertTrue(got['body']['params']['arguments']['create_only']); self.assertTrue(any(isinstance(h,ProxyHandler) and h.proxies=={} for h in seen)); gate.build_opener=old; s.shutdown()
   def test_unsafe_backend_urls_fail_closed(self):
     root=Path(tempfile.mkdtemp()); data=root/'data'; creds=root/'creds'; (data/'auth-tokens').mkdir(parents=True); creds.mkdir(); (root/'logs').mkdir(); (data/'auth-tokens'/'default').write_text('r'); (creds/'client-a.json').write_text('{"token":"a"}')
     base={'root':str(root),'data':str(data),'credentials':str(creds),'ledger':str(root/'logs/l'),'audit':str(root/'logs/a'),'backend_url':'http://127.0.0.1:1/mcp','bind':'127.0.0.1','port':18081,'workspace':'w','project':'p','root_token_file':str(data/'auth-tokens/default'),'clients':[{'owner':'client-a','token_file':str(creds/'client-a.json')}]}

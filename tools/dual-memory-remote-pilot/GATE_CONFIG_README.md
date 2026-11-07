@@ -13,3 +13,11 @@ closed on missing paths, duplicate owners/tokens, non-loopback bind, invalid
 ports, or non-HTTP backend URLs. Tokens remain in owner-only files and are not
 written to HTTP responses or logs. The server is one process; no worker or
 registry layer is introduced. The example config contains no credentials.
+
+Before starting, create the configured root and its `data`, `credentials`,
+and audit/ledger parent directories with owner-only permissions. Prepare the
+named ai-memory workspace/project and a server-only JSON token file of the
+form `{"token":"<server-token>"}`; do not commit or print its value. Start
+the gateway only on its configured loopback bind. A remote client must use an
+operator-managed SSH/TLS tunnel; this adapter does not create or authorize
+network credentials.

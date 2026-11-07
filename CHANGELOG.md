@@ -51,3 +51,10 @@
   granting external-send or production-mutation permission.
 - Export contains no deployment credentials, tokens, databases, raw sessions,
   runtime logs, private host addresses, or absolute user paths.
+
+## 2026-11-07 — portable client follow-up
+
+- Added the durable single-worker outbox client and mock regression coverage
+  for enqueue, ACK/retry, status, owner binding, and gate readback workflows.
+- Disabled ambient HTTP proxy use for loopback gate calls and documented
+  generic token-file, workspace preparation, tunnel, and bounded-worker rules.

@@ -2,7 +2,7 @@
 import argparse,hashlib,json,os,pathlib,re,tempfile,threading,time
 from http.server import BaseHTTPRequestHandler,ThreadingHTTPServer
 from urllib.parse import urlparse
-from urllib.request import Request,urlopen,HTTPRedirectHandler,build_opener
+from urllib.request import Request,urlopen,HTTPRedirectHandler,ProxyHandler,build_opener
 DEFAULT_ROOT=pathlib.Path('/var/lib/structured-handoff')
 FIELDS=('event_id','session_id','title','summary','progress','next_step','acceptance','recipient'); ID=re.compile(r'^[A-Za-z0-9][A-Za-z0-9_.-]{2,127}$'); MAX=4096
 STATE_LOCK=threading.RLock(); AUDIT_LOCK=threading.Lock()
@@ -52,7 +52,7 @@ def save_ledger(value):
 def backend(method,args):
     args=dict(args); name=args.pop('_name'); body=json.dumps({'jsonrpc':'2.0','id':1,'method':method,'params':{'name':name,'arguments':args}}).encode()
     req=Request(BACKEND,data=body,method='POST',headers={'Authorization':'Bearer '+ROOT_TOKEN,'Content-Type':'application/json','Accept':'application/json, text/event-stream'})
-    with build_opener(NoRedirect).open(req,timeout=15) as r: result=json.loads(r.read(65536))
+    with build_opener(ProxyHandler({}),NoRedirect()).open(req,timeout=15) as r: result=json.loads(r.read(65536))
     if 'error' in result: raise RuntimeError('backend rpc error')
     env=result.get('result') or {}
     if env.get('isError'): raise RuntimeError('backend tool error')
